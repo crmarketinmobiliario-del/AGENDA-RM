@@ -1,1 +1,10 @@
-Agenda Ejecutiva V4. La pluma negra completa es el control: primer toque abre la hoja para escribir, segundo toque guarda. Sin botón rectangular de pluma. Subir todos los archivos a la raíz del sitio HTTPS y actualizar la PWA. Prototipo web, no APK; la pantalla de bloqueo interactiva y notificaciones de fondo todavía no están implementadas.
+AGENDA EJECUTIVA V5 — CAMBIOS
+
+1. Desliza horizontalmente la hoja marfil: siempre hay una última hoja en blanco.
+2. En la hoja en blanco toca la pluma para abrir el teclado; vuelve a tocar la pluma para guardar.
+3. Puedes activar las notificaciones con el botón «Activar avisos» dentro de la aplicación.
+4. Los recordatorios programados se revisan mientras la PWA está ejecutándose y cuando regresas a ella.
+5. No garantiza avisos a la hora indicada si la PWA está cerrada o Android la suspende. Para eso hace falta implementación Android nativa con AlarmManager/WorkManager y permisos pertinentes, o un servidor Push.
+6. La pantalla de bloqueo sigue siendo una maqueta; Android no permite convertir una PWA en pantalla de bloqueo interactiva arbitraria.
+7. Guarda respaldo JSON antes de actualizar. Los datos se conservan por el mismo origen del navegador, pero no al cambiar de dominio.
+8. Sube TODOS los archivos a la raíz del sitio HTTPS y actualiza la app instalada.
