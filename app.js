@@ -31,12 +31,30 @@ function render(){
  $("#page-counter").textContent=`‹   Hoja ${page+1} de ${count}   ›`;
  $("#paper").classList.toggle("blank-page",blank);
 }
-function movePage(direction){if(editing)return;const next=Math.max(0,Math.min(page+direction,totalPages()-1));if(next!==page){page=next;$("#paper").classList.remove("turning");void $("#paper").offsetWidth;$("#paper").classList.add("turning");render()}else toast(direction>0?"Última hoja: lista para escribir":"Primera hoja")}
+function movePage(direction){if(editing)return;const next=Math.max(0,Math.min(page+direction,totalPages()-1));if(next!==page){page=next;paper.classList.remove("turn-next","turn-prev");void paper.offsetWidth;paper.classList.add(direction>0?"turn-next":"turn-prev");render()}else toast(direction>0?"Última hoja: lista para escribir":"Primera hoja")}
 const paper=$("#paper");
-paper.addEventListener("touchstart",e=>{if(e.target.closest("input"))return;touchStart={x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY}},{passive:true});
-paper.addEventListener("touchend",e=>{if(!touchStart)return;const dx=e.changedTouches[0].clientX-touchStart.x,dy=e.changedTouches[0].clientY-touchStart.y;touchStart=null;if(Math.abs(dx)>35&&Math.abs(dx)>Math.abs(dy)*1.15)movePage(dx<0?1:-1)},{passive:true});
-// También funciona con ratón en PC.
-let mouseX=null;paper.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse"&&!e.target.closest("input"))mouseX=e.clientX});paper.addEventListener("pointerup",e=>{if(mouseX!==null){const d=e.clientX-mouseX;mouseX=null;if(Math.abs(d)>40)movePage(d<0?1:-1)}});
+let swipe=null;
+paper.addEventListener("pointerdown",e=>{
+ if(editing||e.target.closest("input,button,textarea"))return;
+ swipe={id:e.pointerId,x:e.clientX,y:e.clientY};
+},{passive:true});
+paper.addEventListener("pointerup",e=>{
+ if(!swipe||swipe.id!==e.pointerId)return;
+ const dx=e.clientX-swipe.x,dy=e.clientY-swipe.y;
+ swipe=null;
+ if(Math.abs(dx)>=28&&Math.abs(dx)>Math.abs(dy)*1.1)movePage(dx<0?1:-1);
+},{passive:true});
+paper.addEventListener("pointercancel",()=>swipe=null);
+if(!window.PointerEvent){
+ let x=null,y=null;
+ paper.addEventListener("touchstart",e=>{x=e.changedTouches[0].clientX;y=e.changedTouches[0].clientY},{passive:true});
+ paper.addEventListener("touchend",e=>{
+  if(x===null)return;
+  const dx=e.changedTouches[0].clientX-x,dy=e.changedTouches[0].clientY-y;
+  x=y=null;
+  if(Math.abs(dx)>28&&Math.abs(dx)>Math.abs(dy)*1.1)movePage(dx<0?1:-1);
+ },{passive:true});
+}
 $("#page-counter").addEventListener("click",e=>movePage(e.offsetX>e.currentTarget.clientWidth/2?1:-1));
 function startEdit(){
  if(page!==totalPages()-1){page=totalPages()-1;render();toast("Hoja limpia: toca otra vez la pluma para escribir");return}

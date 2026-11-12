@@ -1,5 +1,5 @@
 "use strict";
-const CACHE = "agenda-ejecutiva-v5";
+const CACHE = "agenda-ejecutiva-v6";
 const ASSETS = ["./", "./index.html", "./style.css", "./app.js", "./manifest.webmanifest", "./fondo-original.jpg", "./icon-192.png", "./icon-512.png", "./pluma-ejecutiva.svg"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));

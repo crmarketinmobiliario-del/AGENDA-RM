@@ -1,10 +1,7 @@
-AGENDA EJECUTIVA V5 — CAMBIOS
-
-1. Desliza horizontalmente la hoja marfil: siempre hay una última hoja en blanco.
-2. En la hoja en blanco toca la pluma para abrir el teclado; vuelve a tocar la pluma para guardar.
-3. Puedes activar las notificaciones con el botón «Activar avisos» dentro de la aplicación.
-4. Los recordatorios programados se revisan mientras la PWA está ejecutándose y cuando regresas a ella.
-5. No garantiza avisos a la hora indicada si la PWA está cerrada o Android la suspende. Para eso hace falta implementación Android nativa con AlarmManager/WorkManager y permisos pertinentes, o un servidor Push.
-6. La pantalla de bloqueo sigue siendo una maqueta; Android no permite convertir una PWA en pantalla de bloqueo interactiva arbitraria.
-7. Guarda respaldo JSON antes de actualizar. Los datos se conservan por el mismo origen del navegador, pero no al cambiar de dominio.
-8. Sube TODOS los archivos a la raíz del sitio HTTPS y actualiza la app instalada.
+AGENDA EJECUTIVA V6
+Pluma negra completa visible por encima del papel y tocable.
+Desliza el dedo horizontalmente sobre la hoja para cambiar de página.
+Al final hay una hoja limpia. Toca la pluma para escribir y de nuevo para guardar.
+Sube todos los archivos a la raíz del repositorio y publica con HTTPS.
+Las notificaciones de esta PWA no son alarmas confiables con la app cerrada.
+No es una APK ni puede sustituir la pantalla de bloqueo de Android.
