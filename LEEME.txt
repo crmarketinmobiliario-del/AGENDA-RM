@@ -1,0 +1,27 @@
+AGENDA EJECUTIVA — PRIMER PROTOTIPO LOCAL (12 NOV 2026)
+
+QUÉ INCLUYE
+- Reloj analógico en tiempo real y fecha actual.
+- Pendientes con fecha/hora, palomitas y páginas de cinco tareas (sin límite total).
+- Notas rápidas en hojas marfil. Entra en Notas rápidas, ve a la hoja vacía, toca la pluma para escribir y vuelve a tocarla para guardar.
+- Las notas siguen pendientes hasta marcarlas como atendidas.
+- Deslizamiento horizontal entre hojas.
+- Respaldo e importación JSON.
+- Notificaciones de prueba mientras la página está ABIERTA y tiene permiso. No es un servicio de alarmas en segundo plano.
+- Funciona sin Supabase y sin GitHub una vez servido/cargado; guarda datos en almacenamiento local del navegador.
+
+CÓMO PROBAR EN PC
+1. Descomprime el ZIP.
+2. En esa carpeta abre una terminal y ejecuta: python -m http.server 8000
+3. Visita http://localhost:8000
+También puedes abrir index.html directamente para probar notas, pero el Service Worker requiere HTTP localhost/HTTPS.
+
+IMPORTANTE
+- ESTO NO ES UN APK. Es un primer prototipo web local para revisar diseño y funciones.
+- NO sustituye la pantalla de bloqueo ni permite marcar o escribir allí. Eso requerirá desarrollo Android nativo y verificar restricciones del teléfono.
+- NO se garantizan notificaciones con la pantalla bloqueada o la app cerrada.
+- No se incluye marca Rolex: la esfera es original de estilo ejecutivo para evitar uso comercial de marca ajena.
+- Los datos del navegador se pueden perder si se borra el almacenamiento; exporta respaldos.
+- Para probar en un celular desde otro equipo se necesita servirlo de manera compatible; no basta con instalar este ZIP como APK.
+
+PRÓXIMA FASE: proyecto Android nativo, SQLite, alarmas locales, pruebas de pantalla de bloqueo y APK firmado.
