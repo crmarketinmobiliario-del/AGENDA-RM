@@ -1,7 +1,20 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080706"><link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css"><title>Agenda Ejecutiva · Prototipo</title></head><body>
-<div class="shell"><header><div class="eyebrow">AGENDA EJECUTIVA · EDICIÓN PERSONAL</div><div class="watch"><div class="dial"><div class="brand">RELOJ EJECUTIVO</div><div class="date" id="watchDate"></div><div class="hand hour" id="hour"></div><div class="hand minute" id="minute"></div><div class="hand second" id="second"></div><div class="pin"></div></div></div><div id="today" class="today"></div></header>
-<main><div class="paper"><div class="paperHead"><span id="pageTitle">Mis pendientes de hoy</span><span id="pageCount"></span></div><div id="paperBody" class="paperBody"></div><div class="paperFoot"><button id="prev" aria-label="Hoja anterior">‹</button><span id="pageLabel"></span><button id="next" aria-label="Hoja siguiente">›</button></div></div><button id="pen" class="pen" title="Tocar para escribir o guardar" aria-label="Pluma: escribir o guardar">✒</button></main>
-<nav><button id="showTasks">Pendientes</button><button id="showNotes">Notas rápidas</button><button id="newTask">+ Pendiente</button><button id="settings">Avisos</button></nav><footer>Prototipo local · Los datos se guardan en este dispositivo</footer></div>
-<dialog id="taskDialog"><form id="taskForm" method="dialog"><h2>Nuevo pendiente</h2><label>Descripción<input id="taskText" required maxlength="300"></label><label>Fecha y hora<input id="taskWhen" type="datetime-local"></label><div class="actions"><button type="button" id="cancelTask">Cancelar</button><button type="submit">Guardar</button></div></form></dialog>
-<dialog id="settingsDialog"><div class="settingsContent"><h2>Recordatorios y respaldo</h2><p>Los avisos de este prototipo se comprueban mientras la página está abierta. No sustituyen alarmas nativas ni aparecen de forma garantizada con el celular bloqueado.</p><button id="permission">Permitir notificaciones</button><button id="export">Exportar respaldo JSON</button><label class="import">Importar respaldo JSON<input id="import" type="file" accept="application/json,.json"></label><button id="closeSettings">Cerrar</button></div></dialog>
+<!doctype html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090705"><title>Agenda Ejecutiva de Lujo</title>
+<link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css"></head>
+<body>
+<main id="stage">
+  <img id="background" src="fondo-original.jpg" alt="">
+  <div id="dial" aria-label="Reloj analógico en hora real"><div class="watch-brand">ROLEX</div><div id="marks"></div><div class="hand hour" id="hour"></div><div class="hand minute" id="minute"></div><div class="hand second" id="second"></div><div class="pivot"></div><div id="watch-date"></div></div>
+  <div id="paper">
+    <div class="paper-heading" id="paper-title">Mis Pendientes de Hoy</div>
+    <div id="page-content"></div>
+    <div id="page-counter"></div>
+  </div>
+  <button id="pen" aria-label="Tocar pluma para escribir o guardar"></button>
+  <div id="toast" role="status"></div>
+  <section id="editor" hidden><div class="editor-sheet"><h2>Hoja de notas</h2><p>Escribe aquí. Toca la pluma otra vez para guardar.</p><textarea id="note-text" placeholder="Nombre, teléfono, domicilio, pendiente..."></textarea><label>Recordarme (opcional)<input type="datetime-local" id="note-date"></label><button id="save-note">Guardar con la pluma</button><button id="cancel-note">Cancelar</button></div></section>
+  <div id="toolbar"><button id="add-task">+ Pendiente</button><button id="notes">Notas rápidas</button><button id="export">Respaldar</button></div>
+</main>
+<input type="file" id="restore-file" accept="application/json" hidden>
 <script src="app.js"></script></body></html>

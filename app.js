@@ -1,20 +1,68 @@
-'use strict';
-const KEY='agenda-ejecutiva-local-v1';
-const $=id=>document.getElementById(id);
-const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-let db={tasks:[],notes:[]};try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.tasks)&&Array.isArray(v.notes))db=v;}catch{}
-let mode='tasks',page=0,editing=false,dirty=false;
-const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
-const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function clock(){const d=new Date(),sec=d.getSeconds(),min=d.getMinutes()+sec/60,hour=d.getHours()%12+min/60;$('hour').style.transform=`rotate(${hour*30}deg)`;$('minute').style.transform=`rotate(${min*6}deg)`;$('second').style.transform=`rotate(${sec*6}deg)`;$('watchDate').textContent=d.getDate();$('today').textContent=new Intl.DateTimeFormat('es-MX',{dateStyle:'full'}).format(d)}clock();setInterval(clock,1000);
-function taskList(){return db.tasks.filter(t=>!t.done || t.date===localDay()).sort((a,b)=>Number(a.done)-Number(b.done)||String(a.when||'').localeCompare(String(b.when||'')))}
-function pages(){if(mode==='notes')return [...db.notes.filter(n=>!n.done),null];const tasks=taskList();const out=[];for(let i=0;i<tasks.length;i+=5)out.push(tasks.slice(i,i+5));return out.length?out:[[]]}
-function render(){const all=pages();page=Math.max(0,Math.min(page,all.length-1));$('pageCount').textContent=mode==='tasks'?`${db.tasks.filter(t=>t.done&&t.date===localDay()).length} atendidos`:'';$('pageTitle').textContent=mode==='tasks'?'Mis pendientes de hoy':'Mis notas rápidas';$('pageLabel').textContent=`Hoja ${page+1} de ${all.length}`;$('prev').disabled=page===0;$('next').disabled=page===all.length-1;const body=$('paperBody');body.replaceChildren();if(mode==='tasks'){const current=all[page];if(!current.length){body.innerHTML='<div class="empty">Tu hoja está lista para nuevos pendientes.</div>';return}for(const t of current){const label=document.createElement('label');label.className='item'+(t.done?' done':'');const input=document.createElement('input');input.type='checkbox';input.checked=!!t.done;input.addEventListener('change',()=>{t.done=input.checked;save();render()});const words=document.createElement('span');words.className='words';words.textContent=t.text;if(t.when){const small=document.createElement('small');small.textContent=new Date(t.when).toLocaleString('es-MX',{dateStyle:'short',timeStyle:'short'});words.append(small)}label.append(input,words);body.append(label)}if(db.tasks.length&&db.tasks.every(t=>t.done)){const stamp=document.createElement('div');stamp.className='stamp';stamp.textContent='JORNADA CUMPLIDA';body.append(stamp)}}else{const n=all[page];if(editing){const area=document.createElement('textarea');area.className='noteEditor';area.id='noteInput';area.placeholder='Escribe aquí un nombre, teléfono, domicilio o idea…';area.value=window.draft||'';area.addEventListener('input',()=>{window.draft=area.value;dirty=true});body.append(area);area.focus()}else if(n){const label=document.createElement('label');label.className='item';const box=document.createElement('input');box.type='checkbox';box.title='Marcar como atendida';box.addEventListener('change',()=>{n.done=true;save();render()});const text=document.createElement('div');text.className='noteText';text.textContent=n.text;label.append(box,text);body.append(label)}else{body.innerHTML='<div class="empty">Hoja en blanco. Toca la pluma para escribir.</div>'}}}
-$('prev').onclick=()=>{if(editing)return;page--;render()};$('next').onclick=()=>{if(editing)return;page++;render()};$('showTasks').onclick=()=>{if(editing)return;mode='tasks';page=0;render()};$('showNotes').onclick=()=>{if(editing)return;mode='notes';page=0;render()};$('pen').onclick=()=>{if(mode!=='notes'){mode='notes';page=pages().length-1;render();return}if(!editing){page=pages().length-1;editing=true;window.draft='';render();return}const content=(window.draft||'').trim();if(content){db.notes.unshift({id:crypto.randomUUID(),text:content,done:false,created:new Date().toISOString()});save()}editing=false;dirty=false;window.draft='';page=0;render()};
-$('newTask').onclick=()=>{$('taskForm').reset();$('taskDialog').showModal()};$('cancelTask').onclick=()=>$('taskDialog').close();$('taskForm').onsubmit=e=>{e.preventDefault();const text=$('taskText').value.trim();if(!text)return;const when=$('taskWhen').value;db.tasks.push({id:crypto.randomUUID(),text,when,date:when?when.slice(0,10):localDay(),done:false,notified:false});save();$('taskDialog').close();mode='tasks';page=0;render()};
-$('settings').onclick=()=>$('settingsDialog').showModal();$('closeSettings').onclick=()=>$('settingsDialog').close();$('permission').onclick=async()=>{if(!('Notification'in window)){alert('Este navegador no admite notificaciones.');return}const result=await Notification.requestPermission();alert('Permiso: '+result)};
-$('export').onclick=()=>{const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`agenda-respaldo-${localDay()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
-$('import').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const v=JSON.parse(await file.text());if(!Array.isArray(v.tasks)||!Array.isArray(v.notes))throw Error('Formato inválido');if(!confirm('¿Reemplazar las notas actuales con este respaldo?'))return;db=v;save();page=0;render();alert('Respaldo restaurado')}catch(err){alert('No se pudo importar: '+err.message)}};
-function checkAlerts(){if(!('Notification'in window)||Notification.permission!=='granted')return;const now=Date.now();let changed=false;for(const t of db.tasks){if(t.done||t.notified||!t.when)continue;const due=new Date(t.when).getTime();if(Number.isFinite(due)&&due<=now){new Notification('Agenda Ejecutiva',{body:t.text,tag:`agenda-${t.id}`});t.notified=true;changed=true}}if(changed)save()}setInterval(checkAlerts,30000);checkAlerts();
-let x=0;const paper=document.querySelector('.paper');paper.addEventListener('touchstart',e=>{x=e.changedTouches[0].screenX},{passive:true});paper.addEventListener('touchend',e=>{if(editing)return;const dx=e.changedTouches[0].screenX-x;if(Math.abs(dx)>65){page+=dx<0?1:-1;render()}},{passive:true});
-if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js').catch(()=>{});render();
+"use strict";
+const KEY="agenda-ejecutiva-lujo-v2";
+let state=JSON.parse(localStorage.getItem(KEY)||'{"tasks":[],"notes":[]}');
+let view="tasks",page=0,editing=false;
+const $=s=>document.querySelector(s);
+const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+const toast=msg=>{let e=$("#toast");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2100)};
+function clock(){
+ const d=new Date(),h=d.getHours()%12+d.getMinutes()/60,m=d.getMinutes()+d.getSeconds()/60,s=d.getSeconds();
+ $("#hour").style.transform=`rotate(${h*30}deg)`;
+ $("#minute").style.transform=`rotate(${m*6}deg)`;
+ $("#second").style.transform=`rotate(${s*6}deg)`;
+ $("#watch-date").textContent=d.getDate();
+}
+for(let i=0;i<12;i++){let t=document.createElement("span");t.className="tick";t.style.transform=`rotate(${i*30}deg)`;$("#marks").append(t)}
+clock();setInterval(clock,1000);
+function today(){return new Date().toLocaleDateString("en-CA")}
+function visibleItems(){
+ if(view==="notes")return state.notes.filter(n=>!n.done);
+ return state.tasks.filter(n=>!n.done || n.date===today());
+}
+function render(){
+ const all=visibleItems(),size=6,count=Math.max(1,Math.ceil(all.length/size));page=Math.min(Math.max(page,0),count-1);
+ $("#paper-title").textContent=view==="notes"?"Mis Notas Rápidas":"Mis Pendientes de Hoy";
+ const box=$("#page-content");box.replaceChildren();
+ for(const item of all.slice(page*size,(page+1)*size)){
+  const line=document.createElement("label");line.className="task"+(item.done?" done":"");
+  const check=document.createElement("input");check.type="checkbox";check.checked=!!item.done;
+  check.onchange=()=>{item.done=check.checked;save();render();if(visibleItems().length===0)toast("JORNADA CUMPLIDA")};
+  const span=document.createElement("span");span.className="task-text";span.textContent=item.text;
+  line.append(check,span);
+  if(item.remind){const small=document.createElement("small");small.textContent=new Date(item.remind).toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});line.append(small)}
+  box.append(line);
+ }
+ if(!all.length){const p=document.createElement("p");p.style.cssText="text-align:center;font-style:italic;margin-top:12%;color:#755b38";p.textContent=view==="notes"?"No tienes notas pendientes.":"Tu hoja está lista para nuevos pendientes.";box.append(p)}
+ $("#page-counter").textContent=`‹     Hoja ${page+1} de ${count}     ›`;
+}
+let touchStart=0;
+$("#paper").addEventListener("touchstart",e=>touchStart=e.changedTouches[0].clientX,{passive:true});
+$("#paper").addEventListener("touchend",e=>{const delta=e.changedTouches[0].clientX-touchStart;if(Math.abs(delta)>45){page+=delta<0?1:-1;render()}},{passive:true});
+$("#page-counter").onclick=e=>{page+=e.offsetX>e.currentTarget.clientWidth/2?1:-1;render()};
+function startEdit(){editing=true;$("#editor").hidden=false;$("#note-text").value="";$("#note-date").value="";$("#note-text").focus()}
+function finishEdit(){
+ if(!editing)return;
+ const text=$("#note-text").value.trim(),remind=$("#note-date").value;
+ if(text){const item={id:crypto.randomUUID(),text,done:false,created:new Date().toISOString(),remind};(view==="notes"?state.notes:state.tasks).push(item);save();toast("Nota guardada")}
+ editing=false;$("#editor").hidden=true;render()
+}
+$("#pen").onclick=()=>editing?finishEdit():startEdit();
+$("#save-note").onclick=finishEdit;
+$("#cancel-note").onclick=()=>{$("#editor").hidden=true;editing=false};
+$("#notes").onclick=()=>{view="notes";page=0;render()};
+$("#add-task").onclick=()=>{view="tasks";startEdit()};
+$("#export").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}));a.download="respaldo-agenda.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$("#paper-title").onclick=()=>{view="tasks";page=0;render()};
+if("Notification" in window)$("#toolbar").addEventListener("dblclick",()=>Notification.requestPermission());
+setInterval(()=>{
+ const now=Date.now();
+ for(const item of [...state.tasks,...state.notes]){
+  if(item.remind&&!item.done&&!item.alerted&&new Date(item.remind).getTime()<=now){
+   item.alerted=true;save();
+   if("Notification" in window&&Notification.permission==="granted")new Notification("Agenda Ejecutiva",{body:item.text});
+   toast("Recordatorio: "+item.text);
+  }
+ }
+},15000);
+render();
+if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
