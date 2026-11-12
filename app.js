@@ -47,7 +47,7 @@ function finishEdit(){
  editing=false;$("#editor").hidden=true;render()
 }
 $("#pen").onclick=()=>editing?finishEdit():startEdit();
-$("#save-note").onclick=finishEdit;
+
 $("#cancel-note").onclick=()=>{$("#editor").hidden=true;editing=false};
 $("#notes").onclick=()=>{view="notes";page=0;render()};
 $("#add-task").onclick=()=>{view="tasks";startEdit()};
@@ -65,4 +65,4 @@ setInterval(()=>{
  }
 },15000);
 render();
-if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
+if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("./service-worker.js").catch(()=>{});

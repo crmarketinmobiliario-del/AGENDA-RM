@@ -1,10 +1,1 @@
-AGENDA EJECUTIVA DE LUJO - V2
-Abre index.html en un navegador para revisar la maqueta interactiva.
-Para PWA, sirve estos archivos en HTTPS.
-Esta versión usa la imagen aprobada como fondo, hojas editables y reloj analógico calculado con la hora del dispositivo.
-La pluma abre/guarda una nota, y las notas se almacenan en localStorage.
-Desliza horizontalmente la hoja para cambiar de página.
-Las notificaciones de esta versión son únicamente de demostración con la página abierta; NO son alarmas confiables con la app cerrada.
-NO ES APK. No reemplaza la pantalla de bloqueo de Android.
-La imagen de referencia incluye elementos gráficos estáticos como barra de estado y accesos inferiores; no son controles reales.
-Para una app Android con pantalla de bloqueo se necesita desarrollo nativo y pruebas del dispositivo.
+Agenda Ejecutiva V4. La pluma negra completa es el control: primer toque abre la hoja para escribir, segundo toque guarda. Sin botón rectangular de pluma. Subir todos los archivos a la raíz del sitio HTTPS y actualizar la PWA. Prototipo web, no APK; la pantalla de bloqueo interactiva y notificaciones de fondo todavía no están implementadas.
